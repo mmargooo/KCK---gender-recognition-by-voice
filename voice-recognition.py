@@ -20,15 +20,17 @@ def decimate(signal, w):
     # t = probki/ f probkowania
     audio_duration = float(samples) / w
 
-    # funkcja okna - kaiser
-    signal = signal * np.kaiser(samples, 14)
+    # funkcja okna
+    # signal = signal * np.kaiser(samples, 7)
+    # signal = signal * np.hamming(samples)
+    signal = signal * np.hanning(samples)
 
     spectrum = np.log(abs(np.fft.fft(signal)))
     # spectrum = np.fft.fft(signal)
     spec_dec = spectrum.copy()
 
     # funkcja decimate
-    for beta in [2, 3, 4, 5, 6, 7]:
+    for beta in [2, 3, 4, 5]:
         decimated = sig.decimate(spectrum, beta)
         spec_dec[:len(decimated)] *= decimated
     peak_start = round(50 * audio_duration)
