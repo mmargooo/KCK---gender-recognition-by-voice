@@ -16,6 +16,8 @@ def read_file(file):
 def cut_sample(signal,w):
     duration = 2
     start_at = 0.5
+    if (len(signal)<duration*w):
+        return signal
     return signal[int(start_at*w):int((start_at+duration)*w)]
 
 def decimate(signal, w):
@@ -45,7 +47,7 @@ def decimate(signal, w):
 
 # The voiced speech of a typical adult male will have a fundamental frequency from 85 to 180 Hz,
 # and that of a typical adult female from 165 to 255 Hz.
-def check(file, accuracy):
+def check(file, test=False):
     signal, w = read_file(file)
     # jesli wiecej kanalow wybierz pierwszy
     if (type(signal[0]) in (list, np.ndarray)):
@@ -58,16 +60,20 @@ def check(file, accuracy):
         gender = 'K'
     else:
         gender = 'M'
-    value = file.replace(".wav", "")[-1:]
-    if gender == value:
-        accuracy += 1
-    print(value, f, gender)
-    return accuracy
+    if test:
+        return (gender, f)
+    return gender
 
-if __name__ == "__main__":
-    # files = glob.glob(sys.argv[1] + "/*.wav")
+def test():
     files = glob.glob("./trainall/*.wav")
     accuracy = 0
     for file in files:
-        accuracy = check(file, accuracy)
-        print(accuracy)
+        gender,f = check(file, test=True)
+        value = file.replace(".wav", "")[-1:]
+        if gender == value:
+            accuracy += 1
+        print(file, value, gender, accuracy, f, '' if gender == value else 'NOPE')
+
+if __name__ == "__main__":
+    # test()
+    print(check(sys.argv[1]))
