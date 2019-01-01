@@ -6,13 +6,17 @@ import soundfile as sf
 import numpy as np
 import sys
 
-
 def read_file(file):
     signal, w = sf.read(file)
     if len(signal.shape) > 1:
         signal = [s[0] for s in signal]
     return signal, w
 
+# cut sample from start_at to (start_at+duration)
+def cut_sample(signal,w):
+    duration = 2
+    start_at = 0.5
+    return signal[int(start_at*w):int((start_at+duration)*w)]
 
 def decimate(signal, w):
     samples = len(signal)
@@ -25,8 +29,7 @@ def decimate(signal, w):
     # signal = signal * np.hamming(samples)
     signal = signal * np.hanning(samples)
 
-    spectrum = np.log(abs(np.fft.fft(signal)))
-    # spectrum = np.fft.fft(signal)
+    spectrum = abs(np.fft.fft(signal))
     spec_dec = spectrum.copy()
 
     # funkcja decimate
@@ -44,6 +47,10 @@ def decimate(signal, w):
 # and that of a typical adult female from 165 to 255 Hz.
 def check(file, accuracy):
     signal, w = read_file(file)
+    # jesli wiecej kanalow wybierz pierwszy
+    if (type(signal[0]) in (list, np.ndarray)):
+        signal = [channel[0] for channel in signal[:]]
+    signal = cut_sample(signal,w)
     f = decimate(signal, w)
     if f <= 172.5:
         gender = 'M'
@@ -56,7 +63,6 @@ def check(file, accuracy):
         accuracy += 1
     print(value, f, gender)
     return accuracy
-
 
 if __name__ == "__main__":
     # files = glob.glob(sys.argv[1] + "/*.wav")
