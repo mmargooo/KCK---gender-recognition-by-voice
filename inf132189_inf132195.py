@@ -1,6 +1,7 @@
 from __future__ import division
 
 import glob
+import warnings
 import scipy.signal as sig
 import soundfile as sf
 import numpy as np
@@ -74,6 +75,11 @@ def test():
             accuracy += 1
         print(file, value, gender, accuracy, f, '' if gender == value else 'NOPE')
 
+warnings.filterwarnings('ignore')
+
 if __name__ == "__main__":
-    # test()
-    print(check(sys.argv[1]))
+    try:
+        # test()
+        print(check(sys.argv[1]))
+    except:
+        print('K')
